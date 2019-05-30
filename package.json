@@ -16,7 +16,11 @@
     "bugs": {
         "url": "https://github.com/mailzwj/sstp/issues"
     },
-    "keywords": ["svg", "shape", "path"],
+    "keywords": [
+        "svg",
+        "shape",
+        "path"
+    ],
     "author": "mrzheng",
     "license": "ISC"
 }

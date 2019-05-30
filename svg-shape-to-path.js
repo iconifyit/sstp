@@ -1,6 +1,7 @@
-var fs = require("fs"),
-    DOMParser = require("xmldom").DOMParser,
-    XMLSerializer = require("xmldom").XMLSerializer;
+var fs            = require("fs"),
+    DOMParser     = require("xmldom").DOMParser,
+    XMLSerializer = require("xmldom").XMLSerializer,
+    Converter     = require('./Converter');
 
 var svgn = "http://www.w3.org/2000/svg";
 
@@ -50,18 +51,19 @@ function convertRect(rects, context) {
     var len = rects.length,
         x, y, w, h, deg = 0, proxy = [],
         tran, tranParam = [],
-        pathObj, node;
+        pathObj, node, cls;
     if (len < 1) {
         return;
     }
 
     for (var n = 0; n < len; n++) {
         node = rects.item(n);
-        x = +node.getAttribute("x");
-        y = +node.getAttribute("y");
-        w = +node.getAttribute("width");
-        h = +node.getAttribute("height");
+        x    = +node.getAttribute("x");
+        y    = +node.getAttribute("y");
+        w    = +node.getAttribute("width");
+        h    = +node.getAttribute("height");
         tran = node.getAttribute("transform");
+        cls  = node.getAttribute('class');
 
         if (tran && tran.indexOf("matrix") !== -1) {
             tranParam = tran.replace(/^matrix\s*\(([\d.\s-]+)\)/g, "$1").split(/\s|,/);
@@ -80,7 +82,9 @@ function convertRect(rects, context) {
                                 + " L" + proxy[2].x.toFixed(3) + " " + proxy[2].y.toFixed(3)
                                 + " L" + proxy[3].x.toFixed(3) + " " + proxy[3].y.toFixed(3)
                                 + " Z");
-        pathObj.setAttribute("fill", "#000");
+
+        pathObj.setAttribute('class', cls);
+
         node.parentNode.insertBefore(pathObj, node);
     }
     while(rects.length > 0) {
@@ -89,44 +93,112 @@ function convertRect(rects, context) {
 }
 
 function convertCircle(circles, context) {
-    var len = circles.length,
-        cx, cy, r, pathObj, node;
+    var len,
+        cx,
+        cy,
+        r,
+        pathObj,
+        node,
+        cls;
+
+    len = circles.length;
+
     if (len < 1) {
         return;
     }
 
     for (var n = 0; n < len; n++) {
+
         node = circles.item(n);
-        cx = +node.getAttribute("cx");
-        cy = +node.getAttribute("cy");
-        r = +node.getAttribute("r");
+
+        cx   = +node.getAttribute("cx");
+        cy   = +node.getAttribute("cy");
+        r    = +node.getAttribute("r");
+
+        clas = node.getAttribute('class');
+
         pathObj = context.createElementNS(svgn, "path");
-        pathObj.setAttribute("d", "M" + (cx - r).toFixed(3) + " " + cy.toFixed(3) + " A" + r.toFixed(3) + " " + r.toFixed(3) + " 0 1 0 " + (cx + r).toFixed(3) + " " + cy.toFixed(3) + " A" + r.toFixed(3) + " " + r.toFixed(3) + " 0 1 0 " + (cx - r).toFixed(3) + " " + cy.toFixed(3) + " Z");
-        pathObj.setAttribute("fill", "#000");
+
+        pathObj.setAttribute(
+            "d",
+            "M" +
+            (cx - r).toFixed(3) + " " +
+            cy.toFixed(3) + " A" +
+            r.toFixed(3) + " " +
+            r.toFixed(3) + " 0 1 0 " +
+            (cx + r).toFixed(3) + " " +
+            cy.toFixed(3) + " A" +
+            r.toFixed(3) + " " +
+            r.toFixed(3) + " 0 1 0 " +
+            (cx - r).toFixed(3) + " " +
+            cy.toFixed(3) + " Z"
+        );
+
+        // pathObj.setAttribute("fill", "#000");
+
+        pathObj.setAttribute('class', cls);
+
         node.parentNode.insertBefore(pathObj, node);
     }
+
     while(circles.length > 0) {
         circles.item(0).parentNode.removeChild(circles.item(0));
     }
 }
 
-function convertEllipse(ellipses, context) {
-    var len = ellipses.length,
-        cx, cy, rx, ry, deg = 0,
-        tran, tranParam = [],
-        pathObj, node;
-    if (len < 1) {
-        return;
+function convertLine(lines, context) {
+
+    var len,
+        cls,
+        path,
+        x1,
+        y1,
+        x2,
+        y2;
+
+    len = lines.length;
+
+    for (var i = 0; i < len; i++) {
+        node = lines.item(i);
+        x1   = +node.getAttribute('x1');
+        y1   = +node.getAttribute('y1');
+        x2   = +node.getAttribute('x2');
+        y2   = +node.getAttribute('y2');
+        cls  = node.getAttribute('class');
+
+        path = context.createElementNS(svgn, 'path');
+        path.setAttribute('d', 'M' + x1.toFixed(3) + ' ' + y1.toFixed(3) + ' ' + x2.toFixed(3) + ' ' + y2.toFixed(3) );
+        path.setAttribute('class', cls);
+        node.parentNode.insertBefore(path, node);
     }
 
+    while(lines.length > 0) {
+        lines.item(0).parentNode.removeChild(lines.item(0));
+    }
+}
+
+function convertEllipse(ellipses, context) {
+    var len,
+        cx, cy, rx, ry, deg = 0,
+        tran, tranParam = [],
+        pathObj, node, cls;
+
+    len = ellipses.length;
+
+    if (len < 1) return;
+
     for (var n = 0; n < len; n++) {
+
         node = ellipses.item(n);
-        cx = +node.getAttribute("cx");
-        cy = +node.getAttribute("cy");
-        rx = +node.getAttribute("rx");
-        ry = +node.getAttribute("ry");
+        cx   = +node.getAttribute("cx");
+        cy   = +node.getAttribute("cy");
+        rx   = +node.getAttribute("rx");
+        ry   = +node.getAttribute("ry");
         tran = node.getAttribute("transform");
+        cls  = node.getAttribute('class');
+
         pathObj = context.createElementNS(svgn, "path");
+
         if (tran && tran.indexOf("matrix") !== -1) {
             tranParam = tran.replace(/^matrix\s*\(([\d.\s-]+)\)/g, "$1").split(/\s|,/);
         }
@@ -141,7 +213,10 @@ function convertEllipse(ellipses, context) {
                                     + " A" + rx.toFixed(3) + " " + ry.toFixed(3) + " " + deg.toFixed(3) + " 1 0 " + points[1].x.toFixed(3) + " " + points[1].y.toFixed(3)
                                     + " A" + rx.toFixed(3) + " " + ry.toFixed(3) + " " + deg.toFixed(3) + " 1 0 " + points[0].x.toFixed(3) + " " + points[0].y.toFixed(3)
                                     + " Z");
-        pathObj.setAttribute("fill", "#000");
+        // pathObj.setAttribute("fill", "#000");
+
+        pathObj.setAttribute("class", "cls");
+
         node.parentNode.insertBefore(pathObj, node);
     }
     while(ellipses.length > 0) {
@@ -194,31 +269,72 @@ function mergePath(parent) {
 }
 
 exports.convertToPath = function(sourcefile, toFile) {
-    var svgString, doc, svg, rects, circles, ellipses, polygons, xml;
+
+    var doc,
+        svg,
+        rects,
+        circles,
+        ellipses,
+        polygons,
+        svgString,
+        xml;
+
+    console.log(typeof Converter);
+
     try {
         svgString = fs.readFileSync(sourcefile, "utf8");
-    } catch(e) {
+    }
+    catch(e) {
         throw sourcefile + " not found.";
     }
-    if (!svgString) {
-        return;
-    }
+
+    if (! svgString) return;
 
     doc = new DOMParser().parseFromString(svgString, "text/xml");
     svg = doc.getElementsByTagName("svg")[0];
 
-    rects = svg.getElementsByTagName("rect");
-    circles = svg.getElementsByTagName("circle");
-    ellipses = svg.getElementsByTagName("ellipse");
-    polygons = svg.getElementsByTagName("polygon");
+    // rects    = svg.getElementsByTagName("rect");
+    // circles  = svg.getElementsByTagName("circle");
+    // ellipses = svg.getElementsByTagName("ellipse");
+    // polygons = svg.getElementsByTagName("polygon");
 
-    convertRect(rects, doc);
-    convertCircle(circles, doc);
-    convertEllipse(ellipses, doc);
-    convertPolygon(polygons, doc);
-    mergePath(svg);
+    // convertRect(rects, doc);
+    // convertCircle(circles, doc);
+    // convertEllipse(ellipses, doc);
+    // convertPolygon(polygons, doc);
 
-    xml = new XMLSerializer().serializeToString(doc);
-    // console.log(xml);
-    fs.writeFileSync(toFile, xml, "utf8");
+    convertRect(
+        svg.getElementsByTagName('rect'),
+        doc
+    );
+
+    convertCircle(
+        svg.getElementsByTagName('circle'),
+        doc
+    );
+
+    convertEllipse(
+        svg.getElementsByTagName('ellipse'),
+        doc
+    );
+
+    convertPolygon(
+        svg.getElementsByTagName('polygon'),
+        doc
+    );
+
+    convertLine(
+        svg.getElementsByTagName('line'),
+        doc
+    );
+
+    // mergePath(svg);
+
+    // xml = new XMLSerializer().serializeToString(doc);
+
+    fs.writeFileSync(
+        toFile,
+        new XMLSerializer().serializeToString(doc),
+        "utf8"
+    );
 };
