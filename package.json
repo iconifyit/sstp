@@ -2,7 +2,7 @@
     "name": "sstp",
     "version": "1.0.6",
     "description": "Convert svg shape elements to path element.",
-    "main": "svg-shape-to-path.js",
+    "main": "index.js",
     "scripts": {
         "test": "echo \"Error: no test specified\" && exit 1"
     },
@@ -11,16 +11,26 @@
     },
     "repository": {
         "type": "git",
-        "url": "git://github.com/mailzwj/sstp.git"
+        "url": "git://github.com/iconify/sstp.git"
     },
     "bugs": {
-        "url": "https://github.com/mailzwj/sstp/issues"
+        "url": "https://github.com/iconify/sstp/issues"
     },
     "keywords": [
         "svg",
         "shape",
-        "path"
+        "path",
+        "polygon",
+        "rectangle",
+        "circle",
+        "line",
+        "conversion",
+        "convert"
     ],
     "author": "mrzheng",
-    "license": "ISC"
+    "license": "ISC",
+    "devDependencies": {
+        "lodash": "^4.17.11",
+        "path": "^0.12.7"
+    }
 }

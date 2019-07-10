@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 50 50">
+    <defs>
+        <style>
+            .a{fill:url(#a);}.b{fill:none;stroke:#45413c;stroke-linecap:round;stroke-linejoin:round;stroke-width:1.25px;}.c{fill:#45413c;}.d{fill:#fffacf;}
+        </style>
+        <linearGradient id="a" x1="25.174" y1="21.042" x2="24.888" y2="38.803" gradientUnits="userSpaceOnUse">
+            <stop offset="0" stop-color="#fff48c"/>
+            <stop offset="1" stop-color="#ffe500"/>
+        </linearGradient>
+    </defs>
+    <title>U+1F9B2-bald-hair</title>
+    <path class="a"
+          d="M45.083,37.912a20.863,20.863,0,0,0,.683-3.1,2.983,2.983,0,0,0,0-5.946,20.974,20.974,0,0,0-41.532,0,2.983,2.983,0,0,0,0,5.946,21.032,21.032,0,0,0,.683,3.1A162.553,162.553,0,0,0,45.083,37.912Z"/>
+    <path class="b"
+          d="M45.083,37.912a20.891,20.891,0,0,0,.683-3.1,2.983,2.983,0,0,0,0-5.946,20.974,20.974,0,0,0-41.532,0,2.983,2.983,0,0,0,0,5.946,21.016,21.016,0,0,0,.682,3.1A162.609,162.609,0,0,0,45.083,37.912Z"/>
+    <path d="M18.000 32.342 A1.400 1.400 0 1 0 20.800 32.342 A1.400 1.400 0 1 0 18.000 32.342 Z" class="c"/>
+    <path d="M29.200 32.342 A1.400 1.400 0 1 0 32.000 32.342 A1.400 1.400 0 1 0 29.200 32.342 Z" class="c"/>
+    <path d="M20.000 13.115 A5 1.5 0 1 0 30.000 13.115 A5 1.5 0 1 0 20.000 13.115 Z" class="d"/>
+</svg>

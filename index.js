@@ -1,31 +1,59 @@
-var fs            = require("fs"),
-    DOMParser     = require("xmldom").DOMParser,
-    XMLSerializer = require("xmldom").XMLSerializer,
-    Converter     = require('./Converter').Converter;
+const fs            = require("fs"),
+      path          = require("path"),
+      DOMParser     = require("xmldom").DOMParser,
+      XMLSerializer = require("xmldom").XMLSerializer,
+      Converter     = require('./Converter').Converter,
+      SvgToJson     = require('./SvgToJson').SvgToJson,
+      _             = require('lodash');
 
 try {
     var doc,
-        svgString;
+        svgString,
+        svgDocument,
+        parser,
+        writer,
+        data = [];
 
-    var sourcefile = "./input/amusement-park.svg",
-        toFile     = "./output/amusement-park-v4.svg";
+    var indir  = "./input",
+        outdir = "./output";
 
-    try {
-        svgString = fs.readFileSync(sourcefile, "utf8");
+    parser = new DOMParser();
+    writer = new XMLSerializer();
+
+    let icons = fs
+        .readdirSync(indir)
+        .filter(f => f.endsWith('.svg'));
+
+    function slashit(path) {
+        if (path.charAt(path.length-1) ===  "/") return path;
+        return path + "/";
     }
-    catch(e) {
-        throw sourcefile + " not found.";
-    }
 
-    doc = new Converter(
-        new DOMParser().parseFromString(svgString, "text/xml")
-    ).convertAll();
+    _.each(icons, async (source, iter) => {
 
-    fs.writeFileSync(
-        toFile,
-        new XMLSerializer().serializeToString(doc),
-        "utf8"
-    );
+        source = slashit(indir) + source;
+
+        svgDocument = parser.parseFromString(
+            fs.readFileSync(source, "utf8"),
+            "text/xml"
+        );
+
+        doc = new Converter(svgDocument).convertAll();
+
+        fs.writeFileSync(
+            slashit(outdir) + path.basename(source),
+            writer.serializeToString(doc),
+            "utf8"
+        );
+
+        data = new SvgToJson(doc).getData();
+
+        fs.writeFileSync(
+            slashit(outdir) + 'icons.json',
+            JSON.stringify(data),
+            "utf8"
+        );
+    });
 
     console.log('Done!');
 }
