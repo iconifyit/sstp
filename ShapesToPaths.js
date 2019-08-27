@@ -1,18 +1,29 @@
+
+
 /**
  * Utility class to convert all SVG shape elements to paths.
  * @param document
  * @constructor
  */
-class Converter {
+class ShapesToPaths {
 
     /**
      * Class constructor.
-     * @param document
+     * @param {SVGDocument} document
+     * @constructor
      */
     constructor(document) {
-        this.NS  = "http://www.w3.org/2000/svg";
-        this.doc = document;
-        this.svg = this.doc.getElementsByTagName("svg")[0];
+        this.NS  = "http://www.w3.org/2000/svg"
+        this.doc = document
+        this.svg = null
+
+        try {
+            this.doc.getElementsByTagName("svg")[0]
+        }
+        catch(e) {
+            console.error(e)
+            throw new Error(e)
+        }
     }
 
     /**
@@ -55,6 +66,8 @@ class Converter {
 
             node = items.item(i);
 
+            console.log('Converting Line to Path');
+
             x1 = +node.getAttribute('x1');
             y1 = +node.getAttribute('y1');
             x2 = +node.getAttribute('x2');
@@ -71,6 +84,20 @@ class Converter {
                 'class',
                 node.getAttribute('class')
             );
+
+            path.setAttribute(
+                'data-prevId',
+                node.getAttribute('id') ||
+                node.getAttribute('data-name') ||
+                'from-' + node.nodeName
+            )
+
+            if (node.getAttribute('transform')) {
+                path.setAttribute(
+                    'transform',
+                    node.getAttribute('transform')
+                )
+            }
 
             node.parentNode.insertBefore(path, node);
         }
@@ -99,6 +126,8 @@ class Converter {
 
             node = items.item(n);
 
+            console.log('Converting Rect to Path');
+
             x = +node.getAttribute("x");
             y = +node.getAttribute("y");
             w = +node.getAttribute("width");
@@ -119,6 +148,20 @@ class Converter {
 
             path.setAttribute('class', node.getAttribute('class'));
 
+            path.setAttribute(
+                'data-prevId',
+                node.getAttribute('id') ||
+                node.getAttribute('data-name') ||
+                'from-' + node.nodeName
+            )
+
+            if (node.getAttribute('transform')) {
+                path.setAttribute(
+                    'transform',
+                    node.getAttribute('transform')
+                )
+            }
+
             node.parentNode.insertBefore(path, node);
         }
 
@@ -137,6 +180,8 @@ class Converter {
         for (let n = 0; n < (items || []).length; n++) {
 
             let node = items.item(n);
+
+            console.log('Converting Circle to Path');
 
             const cx = +node.getAttribute("cx"),
                 cy   = +node.getAttribute("cy"),
@@ -160,6 +205,20 @@ class Converter {
 
             path.setAttribute('class', node.getAttribute('class'));
 
+            path.setAttribute(
+                'data-prevId',
+                node.getAttribute('id') ||
+                node.getAttribute('data-name') ||
+                'from-' + node.nodeName
+            )
+
+            if (node.getAttribute('transform')) {
+                path.setAttribute(
+                    'transform',
+                    node.getAttribute('transform')
+                )
+            }
+
             node.parentNode.insertBefore(path, node);
         }
 
@@ -179,6 +238,8 @@ class Converter {
 
             let node   = items.item(n);
 
+            console.log('Converting Polygon to Path');
+
             let points = node.getAttribute("points").split(/\s|,/),
                 data   = "M" + points[0] + " " + points[1];
 
@@ -189,6 +250,20 @@ class Converter {
             const path = this.addPath();
             path.setAttribute("d", data + " Z");
             path.setAttribute('class', node.getAttribute('class'));
+
+            path.setAttribute(
+                'data-prevId',
+                node.getAttribute('id') ||
+                node.getAttribute('data-name') ||
+                'from-' + node.nodeName
+            )
+
+            if (node.getAttribute('transform')) {
+                path.setAttribute(
+                    'transform',
+                    node.getAttribute('transform')
+                )
+            }
 
             node.parentNode.insertBefore(path, node);
         }
@@ -209,12 +284,14 @@ class Converter {
 
             let node = items.item(n);
 
-            const cx   = +node.getAttribute("cx"),
-                cy   = +node.getAttribute("cy"),
-                rx   = +node.getAttribute("rx"),
-                ry   = +node.getAttribute("ry"),
-                deg  = this.getAngle(node),
-                path = this.addPath();
+            console.log('Converting Ellipse to Path');
+
+            const cx    = +node.getAttribute("cx"),
+                  cy    = +node.getAttribute("cy"),
+                  rx    = +node.getAttribute("rx"),
+                  ry    = +node.getAttribute("ry"),
+                  deg   = this.getAngle(node),
+                  path  = this.addPath();
 
             const proxy = this.getEllipseProxy(cx, cy, rx, ry, deg);
 
@@ -229,6 +306,20 @@ class Converter {
             );
 
             path.setAttribute('class', node.getAttribute('class'));
+
+            path.setAttribute(
+                'data-prevId',
+                node.getAttribute('id') ||
+                node.getAttribute('data-name') ||
+                'from-' + node.nodeName
+            )
+
+            if (node.getAttribute('transform')) {
+                path.setAttribute(
+                    'transform',
+                    node.getAttribute('transform')
+                )
+            }
 
             node.parentNode.insertBefore(path, node);
         }
@@ -274,7 +365,7 @@ class Converter {
     getAngle(node) {
 
         let tran,
-            deg = 0,
+            deg   = 0,
             param = [];
 
         tran = node.getAttribute("transform");
@@ -306,8 +397,8 @@ class Converter {
     getProxy(x, y, w, h, deg) {
 
         const c      = {x: x + w / 2, y: y + h / 2},
-            r      = Math.sqrt(Math.pow(w, 2) + Math.pow(h, 2)) / 2,
-            points = [];
+              r      = Math.sqrt(Math.pow(w, 2) + Math.pow(h, 2)) / 2,
+              points = [];
 
         deg = deg * Math.PI / 180;
 
@@ -376,4 +467,5 @@ class Converter {
  * The export.
  * @type {Converter}
  */
-exports.Converter = Converter;
+// export default class Converter;
+exports.ShapesToPaths = ShapesToPaths;
